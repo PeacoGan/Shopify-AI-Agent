@@ -69,24 +69,24 @@ export const config = {
     larkProfile: readEnv('LARK_PROFILE', 'jira-tool-2'),
     fields: {
       sku: readEnv('FEISHU_FIELD_SKU', 'SKU'),
-      shopifyProductId: readEnv('FEISHU_FIELD_SHOPIFY_PRODUCT_ID', 'Shopify Product ID'),
+      shopifyProductId: readEnv('FEISHU_FIELD_SHOPIFY_PRODUCT_ID', 'Shopify 商品ID'),
       shopifyHandle: readEnv('FEISHU_FIELD_SHOPIFY_HANDLE', 'Shopify Handle'),
-      sourceDocUrls: readEnv('FEISHU_FIELD_SOURCE_DOC_URLS', 'Source Doc URLs'),
-      sourceNotes: readEnv('FEISHU_FIELD_SOURCE_NOTES', 'Source Notes'),
-      targetMarket: readEnv('FEISHU_FIELD_TARGET_MARKET', 'Target Market'),
-      brandVoice: readEnv('FEISHU_FIELD_BRAND_VOICE', 'Brand Voice'),
-      approvalStatus: readEnv('FEISHU_FIELD_APPROVAL_STATUS', 'Approval Status'),
-      draftJson: readEnv('FEISHU_FIELD_DRAFT_JSON', 'AI Draft JSON'),
-      diffJson: readEnv('FEISHU_FIELD_DIFF_JSON', 'Shopify Diff JSON'),
-      lastError: readEnv('FEISHU_FIELD_LAST_ERROR', 'Last Error'),
-      lastSyncedAt: readEnv('FEISHU_FIELD_LAST_SYNCED_AT', 'Last Synced At')
+      sourceDocUrls: readEnv('FEISHU_FIELD_SOURCE_DOC_URLS', '资料文档链接'),
+      sourceNotes: readEnv('FEISHU_FIELD_SOURCE_NOTES', '资料备注'),
+      targetMarket: readEnv('FEISHU_FIELD_TARGET_MARKET', '目标市场'),
+      brandVoice: readEnv('FEISHU_FIELD_BRAND_VOICE', '品牌语气'),
+      approvalStatus: readEnv('FEISHU_FIELD_APPROVAL_STATUS', '审批状态'),
+      draftJson: readEnv('FEISHU_FIELD_DRAFT_JSON', 'AI草稿JSON'),
+      diffJson: readEnv('FEISHU_FIELD_DIFF_JSON', 'Shopify差异JSON'),
+      lastError: readEnv('FEISHU_FIELD_LAST_ERROR', '最近错误'),
+      lastSyncedAt: readEnv('FEISHU_FIELD_LAST_SYNCED_AT', '最近同步时间')
     },
     statuses: {
-      ready: readEnv('FEISHU_STATUS_READY', 'Ready for AI'),
-      pendingApproval: readEnv('FEISHU_STATUS_PENDING_APPROVAL', 'Pending Approval'),
-      approved: readEnv('FEISHU_STATUS_APPROVED', 'Approved'),
-      applied: readEnv('FEISHU_STATUS_APPLIED', 'Applied'),
-      error: readEnv('FEISHU_STATUS_ERROR', 'Error')
+      ready: readEnv('FEISHU_STATUS_READY', '待生成'),
+      pendingApproval: readEnv('FEISHU_STATUS_PENDING_APPROVAL', '待审批'),
+      approved: readEnv('FEISHU_STATUS_APPROVED', '已批准'),
+      applied: readEnv('FEISHU_STATUS_APPLIED', '已同步'),
+      error: readEnv('FEISHU_STATUS_ERROR', '错误')
     }
   },
   shopify: {

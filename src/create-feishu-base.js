@@ -6,23 +6,23 @@ const tableName = process.argv[3] || '商品审批';
 
 const fields = [
   textField('SKU'),
-  textField('Shopify Product ID'),
+  textField('Shopify 商品ID'),
   textField('Shopify Handle'),
-  textField('Source Doc URLs'),
-  textField('Source Notes'),
-  textField('Target Market'),
-  textField('Brand Voice'),
-  singleSelectField('Approval Status', [
-    'Ready for AI',
-    'Pending Approval',
-    'Approved',
-    'Applied',
-    'Error'
+  textField('资料文档链接'),
+  textField('资料备注'),
+  textField('目标市场'),
+  textField('品牌语气'),
+  singleSelectField('审批状态', [
+    '待生成',
+    '待审批',
+    '已批准',
+    '已同步',
+    '错误'
   ]),
-  textField('AI Draft JSON'),
-  textField('Shopify Diff JSON'),
-  textField('Last Error'),
-  textField('Last Synced At')
+  textField('AI草稿JSON'),
+  textField('Shopify差异JSON'),
+  textField('最近错误'),
+  textField('最近同步时间')
 ];
 
 try {

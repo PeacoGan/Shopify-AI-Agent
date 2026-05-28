@@ -31,7 +31,7 @@ node src/check-connections.js
 node src/draft-products.js
 ```
 
-确认飞书里生成的 `AI Draft JSON` 和 `Shopify Diff JSON` 没问题后，把对应行的 `Approval Status` 改成 `Approved`。再把 `.env` 里的 `DRY_RUN=false`，执行：
+确认飞书里生成的 `AI草稿JSON` 和 `Shopify差异JSON` 没问题后，把对应行的 `审批状态` 改成 `已批准`。再把 `.env` 里的 `DRY_RUN=false`，执行：
 
 ```bash
 node src/apply-approved.js
@@ -75,14 +75,14 @@ node src/create-feishu-base.js
 ## Workflow
 
 1. Feishu Bitable contains one row per SKU.
-2. Rows with `Approval Status = Ready for AI` are processed by `node src/draft-products.js`.
+2. Rows with `审批状态 = 待生成` are processed by `node src/draft-products.js`.
 3. The script reads product notes and linked Feishu docs, generates English Shopify content, and writes:
-   - `AI Draft JSON`
-   - `Shopify Diff JSON`
-   - `Approval Status = Pending Approval`
-4. An operator reviews the draft in Feishu and changes `Approval Status` to `Approved`.
+   - `AI草稿JSON`
+   - `Shopify差异JSON`
+   - `审批状态 = 待审批`
+4. An operator reviews the draft in Feishu and changes `审批状态` to `已批准`.
 5. `node src/apply-approved.js` updates only matching Shopify products whose status is `DRAFT`.
-6. The row becomes `Applied`, or `Error` with `Last Error`.
+6. The row becomes `已同步`, or `错误` with `最近错误`.
 
 ## Feishu Bitable fields
 
@@ -91,17 +91,17 @@ Create these fields or change the names in `.env`:
 | Field | Purpose |
 | --- | --- |
 | `SKU` | Product SKU for tracking. |
-| `Shopify Product ID` | Shopify product numeric ID or `gid://shopify/Product/...`. Preferred. |
+| `Shopify 商品ID` | Shopify product numeric ID or `gid://shopify/Product/...`. Preferred. |
 | `Shopify Handle` | Fallback lookup if product ID is empty. |
-| `Source Doc URLs` | Feishu docx URLs that contain long product material. |
-| `Source Notes` | Short product facts, specs, positioning, constraints. |
-| `Target Market` | Example: `US`, `UK`, `EU`. |
-| `Brand Voice` | Example: `clear, premium, practical`. |
-| `Approval Status` | `Ready for AI`, `Pending Approval`, `Approved`, `Applied`, `Error`. |
-| `AI Draft JSON` | Generated Shopify content for review. |
-| `Shopify Diff JSON` | Difference between current Shopify draft and AI draft. |
-| `Last Error` | Error details. |
-| `Last Synced At` | ISO timestamp. |
+| `资料文档链接` | Feishu docx URLs that contain long product material. |
+| `资料备注` | Short product facts, specs, positioning, constraints. |
+| `目标市场` | Example: `US`, `UK`, `EU`. |
+| `品牌语气` | Example: `clear, premium, practical`. |
+| `审批状态` | `待生成`, `待审批`, `已批准`, `已同步`, `错误`. |
+| `AI草稿JSON` | Generated Shopify content for review. |
+| `Shopify差异JSON` | Difference between current Shopify draft and AI draft. |
+| `最近错误` | Error details. |
+| `最近同步时间` | ISO timestamp. |
 
 ## Setup
 

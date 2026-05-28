@@ -89,7 +89,7 @@ export function buildAppliedFields(result) {
 export function parseDraftJson(value) {
   const text = normalizeFieldValue(value);
   if (!text) {
-    throw new Error('Missing AI Draft JSON');
+    throw new Error('Missing AI草稿JSON');
   }
 
   return JSON.parse(text);

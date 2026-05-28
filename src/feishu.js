@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const FEISHU_BASE_URL = 'https://open.feishu.cn/open-apis';
 
@@ -23,14 +23,14 @@ export class FeishuClient {
       headers.Authorization = `Bearer ${await this.getTenantAccessToken()}`;
     }
 
-    const response = await fetch(`${FEISHU_BASE_URL}${path}`, {
-      ...options,
-      headers
+    const { status, body } = requestJsonWithCurl(`${FEISHU_BASE_URL}${path}`, {
+      method: options.method ?? 'GET',
+      headers,
+      body: options.body
     });
-    const body = await response.json().catch(() => ({}));
 
-    if (!response.ok || (body.code !== undefined && body.code !== 0)) {
-      throw new Error(`Feishu API error ${response.status}: ${JSON.stringify(body)}`);
+    if (status < 200 || status >= 300 || (body.code !== undefined && body.code !== 0)) {
+      throw new Error(`Feishu API error ${status}: ${JSON.stringify(body)}`);
     }
 
     return body;
@@ -79,7 +79,7 @@ export class FeishuClient {
       );
 
       records.push(...(body.data?.items ?? []));
-      pageToken = body.data?.page_token;
+      pageToken = body.data?.has_more ? body.data?.page_token : undefined;
     } while (pageToken);
 
     return records;
@@ -93,6 +93,32 @@ export class FeishuClient {
     return this.request(`/bitable/v1/apps/${appToken}/tables/${tableId}/records/${recordId}`, {
       method: 'PUT',
       body: JSON.stringify({ fields })
+    });
+  }
+
+  async listFields({ appToken, tableId }) {
+    const fields = [];
+    let pageToken;
+
+    do {
+      const query = new URLSearchParams({ page_size: '100' });
+      if (pageToken) {
+        query.set('page_token', pageToken);
+      }
+      const body = await this.request(
+        `/bitable/v1/apps/${appToken}/tables/${tableId}/fields?${query}`
+      );
+      fields.push(...(body.data?.items ?? []));
+      pageToken = body.data?.has_more ? body.data?.page_token : undefined;
+    } while (pageToken);
+
+    return fields;
+  }
+
+  async updateField({ appToken, tableId, fieldId, field }) {
+    return this.request(`/bitable/v1/apps/${appToken}/tables/${tableId}/fields/${fieldId}`, {
+      method: 'PUT',
+      body: JSON.stringify(field)
     });
   }
 
@@ -217,6 +243,37 @@ export class FeishuClient {
     });
     return output.trim();
   }
+}
+
+function requestJsonWithCurl(url, { method, headers, body }) {
+  const args = ['-sS', '-m', '30', '-w', '\\n%{http_code}', '-X', method];
+  for (const [key, value] of Object.entries(headers)) {
+    args.push('-H', `${key}: ${value}`);
+  }
+  if (body !== undefined) {
+    args.push('--data-binary', body);
+  }
+  args.push(url);
+
+  const result = spawnSync('curl', args, {
+    encoding: 'utf8',
+    maxBuffer: 10 * 1024 * 1024
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    throw new Error(`curl failed ${result.status}: ${result.stderr}`);
+  }
+
+  const output = result.stdout.trimEnd();
+  const splitAt = output.lastIndexOf('\n');
+  const responseText = splitAt === -1 ? output : output.slice(0, splitAt);
+  const status = Number(splitAt === -1 ? 0 : output.slice(splitAt + 1));
+  const parsed = responseText ? JSON.parse(responseText) : {};
+
+  return { status, body: parsed };
 }
 
 function normalizeLarkCliRecords(body) {
