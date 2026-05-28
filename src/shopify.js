@@ -97,6 +97,41 @@ export class ShopifyClient {
     return data.shop;
   }
 
+  async createDraftProduct({ title, handle, descriptionHtml = '', tags = [] }) {
+    const data = await this.graphql(
+      `mutation ProductCreate($product: ProductCreateInput!) {
+        productCreate(product: $product) {
+          product {
+            id
+            handle
+            title
+            status
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }`,
+      {
+        product: {
+          title,
+          handle,
+          descriptionHtml,
+          status: 'DRAFT',
+          tags
+        }
+      }
+    );
+
+    const errors = data.productCreate.userErrors;
+    if (errors.length > 0) {
+      throw new Error(`Shopify productCreate userErrors: ${JSON.stringify(errors)}`);
+    }
+
+    return data.productCreate.product;
+  }
+
   async getProductByHandle(handle) {
     const data = await this.graphql(
       `query ProductByHandle($handle: String!) {
