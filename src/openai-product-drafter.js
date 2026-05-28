@@ -85,7 +85,7 @@ export class ProductDrafter {
       return this.draftWithDeepSeek({ sku, targetMarket, brandVoice, sourceNotes, sourceDocuments });
     }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const body = await fetchJsonWithTimeout('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.openai.apiKey}`,
@@ -120,17 +120,17 @@ export class ProductDrafter {
       }
       })
     });
-
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok || body.error) {
-      throw new Error(`OpenAI Responses API error ${response.status}: ${JSON.stringify(body)}`);
+    if (!body.ok || body.payload.error) {
+      throw new Error(
+        `OpenAI Responses API error ${body.status}: ${JSON.stringify(body.payload)}`
+      );
     }
 
-    return JSON.parse(extractOutputText(body));
+    return JSON.parse(extractOutputText(body.payload));
   }
 
   async draftWithDeepSeek({ sku, targetMarket, brandVoice, sourceNotes, sourceDocuments }) {
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
+    const body = await fetchJsonWithTimeout('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.deepseek.apiKey}`,
@@ -139,6 +139,7 @@ export class ProductDrafter {
       body: JSON.stringify({
         model: this.deepseek.model,
         temperature: 0.2,
+        max_tokens: 1800,
         response_format: { type: 'json_object' },
         messages: [
           {
@@ -167,12 +168,30 @@ export class ProductDrafter {
       })
     });
 
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok || body.error) {
-      throw new Error(`DeepSeek API error ${response.status}: ${JSON.stringify(body)}`);
+    if (!body.ok || body.payload.error) {
+      throw new Error(`DeepSeek API error ${body.status}: ${JSON.stringify(body.payload)}`);
     }
 
-    return normalizeDraft(JSON.parse(body.choices?.[0]?.message?.content ?? '{}'));
+    return normalizeDraft(JSON.parse(body.payload.choices?.[0]?.message?.content ?? '{}'));
+  }
+}
+
+async function fetchJsonWithTimeout(url, options, timeoutMs = 90_000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    const payload = await response.json().catch(() => ({}));
+    return {
+      ok: response.ok,
+      status: response.status,
+      payload
+    };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

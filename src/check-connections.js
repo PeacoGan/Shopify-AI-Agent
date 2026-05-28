@@ -42,7 +42,7 @@ try {
   const shop = await shopify.getShop();
   console.log(`Shopify OK. Connected to ${shop.name} (${shop.myshopifyDomain}).`);
 
-  console.log('Checking OpenAI...');
+  console.log(`Checking ${config.llmProvider}...`);
   const draft = await drafter.draftEnglishProductPage({
     sku: 'CONNECTION_TEST',
     targetMarket: 'US',
@@ -51,7 +51,7 @@ try {
       'Test product: a dimmable LED desk lamp with adjustable brightness and warm/cool color modes.',
     sourceDocuments: ''
   });
-  console.log(`OpenAI OK. Sample title: ${draft.title}`);
+  console.log(`${config.llmProvider} OK. Sample title: ${draft.title}`);
 
   console.log('All connections passed.');
 } catch (error) {
