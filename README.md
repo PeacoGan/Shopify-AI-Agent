@@ -59,6 +59,17 @@ FEISHU_USE_LARK_CLI=false
 - `FEISHU_BITABLE_APP_TOKEN`：URL 里的 `base`/`app_token`
 - `FEISHU_BITABLE_TABLE_ID`：URL 参数或页面里的 `table=tbl...`
 
+也可以让脚本创建一张新表：
+
+```bash
+node src/create-feishu-base.js
+```
+
+默认会创建：
+
+- 多维表格：`Shopify AI 商品运营审批台`
+- 数据表：`商品审批`
+
 ## Workflow
 
 1. Feishu Bitable contains one row per SKU.

@@ -96,6 +96,34 @@ export class FeishuClient {
     });
   }
 
+  async createBitable({ name, folderToken, timeZone = 'Asia/Shanghai' }) {
+    const body = {
+      name,
+      time_zone: timeZone
+    };
+    if (folderToken) {
+      body.folder_token = folderToken;
+    }
+
+    return this.request('/bitable/v1/apps', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+  }
+
+  async createTable({ appToken, name, fields }) {
+    return this.request(`/bitable/v1/apps/${appToken}/tables`, {
+      method: 'POST',
+      body: JSON.stringify({
+        table: {
+          name,
+          default_view_name: '全部商品',
+          fields
+        }
+      })
+    });
+  }
+
   async getDocMarkdown(documentId) {
     if (this.useLarkCli) {
       return this.getDocMarkdownWithLarkCli(documentId);

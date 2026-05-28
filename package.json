@@ -7,6 +7,7 @@
   "scripts": {
     "setup": "node src/setup-env.js",
     "check:feishu": "node src/check-feishu-auth.js",
+    "create:feishu-base": "node src/create-feishu-base.js",
     "draft": "node src/draft-products.js",
     "apply": "node src/apply-approved.js",
     "check": "for file in src/*.js; do node --check \"$file\"; done"
