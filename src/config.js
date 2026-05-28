@@ -92,6 +92,8 @@ export const config = {
   shopify: {
     shopDomain: readEnv('SHOPIFY_SHOP_DOMAIN'),
     adminAccessToken: readEnv('SHOPIFY_ADMIN_ACCESS_TOKEN'),
+    clientId: readEnv('SHOPIFY_CLIENT_ID'),
+    clientSecret: readEnv('SHOPIFY_CLIENT_SECRET'),
     apiVersion: readEnv('SHOPIFY_API_VERSION', '2026-04')
   },
   dryRun: readBoolean('DRY_RUN', true)

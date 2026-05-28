@@ -15,9 +15,11 @@ try {
   const requiredConfig = [
     'feishu.bitableAppToken',
     'feishu.bitableTableId',
-    'shopify.shopDomain',
-    'shopify.adminAccessToken'
+    'shopify.shopDomain'
   ];
+  if (!config.shopify.clientId || !config.shopify.clientSecret) {
+    requiredConfig.push('shopify.adminAccessToken');
+  }
   if (!config.feishu.useLarkCli) {
     requiredConfig.push('feishu.appId', 'feishu.appSecret');
   }

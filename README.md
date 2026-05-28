@@ -19,7 +19,9 @@ This MVP reads product source material from Feishu, uses AI to draft an English 
 | `FEISHU_USE_LARK_CLI` | 新机器人建议保持 `false`，用 App ID/Secret 直连 |
 | `LARK_PROFILE` | 仅本机复用 lark-cli 授权时需要，新机器人模式不用填 |
 | `SHOPIFY_SHOP_DOMAIN` | 例如 `your-shop.myshopify.com` |
-| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Shopify custom app Admin API access token |
+| `SHOPIFY_ADMIN_ACCESS_TOKEN` | 旧版 custom app 的 Admin API access token |
+| `SHOPIFY_CLIENT_ID` | 新版 Dev Dashboard app 的 Client ID |
+| `SHOPIFY_CLIENT_SECRET` | 新版 Dev Dashboard app 的 Client secret |
 
 第一次不要改 `DRY_RUN=true`。填完后按顺序执行：
 

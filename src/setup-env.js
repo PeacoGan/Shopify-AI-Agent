@@ -44,6 +44,11 @@ try {
     'SHOPIFY_ADMIN_ACCESS_TOKEN',
     defaults.SHOPIFY_ADMIN_ACCESS_TOKEN
   );
+  defaults.SHOPIFY_CLIENT_ID = await ask('SHOPIFY_CLIENT_ID', defaults.SHOPIFY_CLIENT_ID);
+  defaults.SHOPIFY_CLIENT_SECRET = await askSecret(
+    'SHOPIFY_CLIENT_SECRET',
+    defaults.SHOPIFY_CLIENT_SECRET
+  );
   defaults.DRY_RUN = await ask('DRY_RUN (true/false)', defaults.DRY_RUN || 'true');
 
   writeFileSync(envPath, renderEnv(defaults));
@@ -127,6 +132,8 @@ function renderEnv(env) {
     '',
     `SHOPIFY_SHOP_DOMAIN=${normalizeShopDomain(env.SHOPIFY_SHOP_DOMAIN || '')}`,
     `SHOPIFY_ADMIN_ACCESS_TOKEN=${env.SHOPIFY_ADMIN_ACCESS_TOKEN || ''}`,
+    `SHOPIFY_CLIENT_ID=${env.SHOPIFY_CLIENT_ID || ''}`,
+    `SHOPIFY_CLIENT_SECRET=${env.SHOPIFY_CLIENT_SECRET || ''}`,
     `SHOPIFY_API_VERSION=${env.SHOPIFY_API_VERSION || '2026-04'}`,
     '',
     '# Optional safety switch. Leave true until credentials and field mapping are verified.',

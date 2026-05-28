@@ -1,7 +1,12 @@
 export class ShopifyClient {
-  constructor({ shopDomain, adminAccessToken, apiVersion }) {
-    this.endpoint = `https://${shopDomain}/admin/api/${apiVersion}/graphql.json`;
+  constructor({ shopDomain, adminAccessToken, clientId, clientSecret, apiVersion }) {
+    this.shopDomain = normalizeShopDomain(shopDomain);
+    this.endpoint = `https://${this.shopDomain}/admin/api/${apiVersion}/graphql.json`;
     this.adminAccessToken = adminAccessToken;
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.cachedAccessToken = null;
+    this.cachedAccessTokenExpiresAt = 0;
   }
 
   async graphql(query, variables = {}) {
@@ -9,7 +14,7 @@ export class ShopifyClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': this.adminAccessToken
+        'X-Shopify-Access-Token': await this.getAccessToken()
       },
       body: JSON.stringify({ query, variables })
     });
@@ -20,6 +25,41 @@ export class ShopifyClient {
     }
 
     return body.data;
+  }
+
+  async getAccessToken() {
+    if (this.adminAccessToken && !this.adminAccessToken.startsWith('atkn_')) {
+      return this.adminAccessToken;
+    }
+
+    if (!this.clientId || !this.clientSecret) {
+      return this.adminAccessToken;
+    }
+
+    if (this.cachedAccessToken && Date.now() < this.cachedAccessTokenExpiresAt - 60_000) {
+      return this.cachedAccessToken;
+    }
+
+    const response = await fetch(`https://${this.shopDomain}/admin/oauth/access_token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: this.clientId,
+        client_secret: this.clientSecret
+      })
+    });
+
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok || !body.access_token) {
+      throw new Error(`Shopify token request failed ${response.status}: ${JSON.stringify(body)}`);
+    }
+
+    this.cachedAccessToken = body.access_token;
+    this.cachedAccessTokenExpiresAt = Date.now() + Number(body.expires_in ?? 86400) * 1000;
+    return this.cachedAccessToken;
   }
 
   async getProductById(productId) {
@@ -179,6 +219,23 @@ export function normalizeProductGid(productId) {
   }
 
   return `gid://shopify/Product/${productId}`;
+}
+
+function normalizeShopDomain(shopDomain) {
+  const value = String(shopDomain || '')
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .trim();
+
+  if (!value) {
+    return value;
+  }
+
+  if (value.endsWith('.myshopify.com')) {
+    return value;
+  }
+
+  return value;
 }
 
 export function summarizeProductDiff(current, draft) {
