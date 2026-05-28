@@ -24,6 +24,7 @@ This MVP reads product source material from Feishu, uses AI to draft an English 
 第一次不要改 `DRY_RUN=true`。填完后按顺序执行：
 
 ```bash
+node src/setup-env.js
 node src/check-connections.js
 node src/draft-products.js
 ```
@@ -129,6 +130,7 @@ The script refuses to update products unless Shopify reports `status = DRAFT`.
 Check credentials and API connectivity:
 
 ```bash
+node src/setup-env.js
 node src/check-connections.js
 ```
 
